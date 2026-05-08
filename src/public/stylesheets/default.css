@@ -1,5 +1,10 @@
 * {
-  font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+  font-family:
+    Helvetica Neue,
+    Helvetica,
+    Arial,
+    sans-serif;
+  box-sizing: border-box; /* adicionado */
 }
 
 body.hide-cpu .container.cpu,
@@ -12,7 +17,7 @@ body.hide-statusCodes .container.statusCodes {
 }
 
 h1 {
-  font-size: 3em;
+  font-size: clamp(1.5em, 5vw, 3em); /* era 3em fixo */
   color: #222;
   margin: 0;
 }
@@ -21,7 +26,6 @@ h5 {
   margin: 0;
   color: #888;
 }
-
 h6 {
   margin: 0;
 }
@@ -35,18 +39,20 @@ span {
   cursor: pointer;
   font-size: 10px;
   margin-left: 5px;
-  border: 1px solid #DDD;
+  border: 1px solid #ddd;
   padding: 3px 10px 4px 10px;
 }
 
 canvas {
-  width: 400px;
+  width: 100% !important; /* era 400px fixo */
   height: 100px;
 }
 
 .content {
-  width: 600px;
+  width: 100%;
   margin: auto;
+  padding: 0 16px;
+  /* max-width removido */
 }
 
 .active {
@@ -54,19 +60,25 @@ canvas {
 }
 
 .stats-column {
-  flex: 0 0 200px;
+  flex: 0 0 200px; /* fixo — não estica */
+  min-width: 120px;
 }
 
 .container {
   display: flex;
   flex-direction: row;
   margin-top: 20px;
-  height: 100px;
+  height: auto; /* era 100px fixo — impedia wrap correto */
+  min-height: 100px;
+  flex-wrap: wrap; /* adicionado: permite quebra em telas pequenas */
+  gap: 8px;
 }
 
 .chart-container {
-  width: 400px;
+  flex: 1 1 200px;
+  min-width: 0;
   height: 100px;
+  max-height: 120px; /* teto para telas muito largas */
 }
 
 .container.healthChecks {
@@ -79,15 +91,16 @@ canvas {
   border: 1px solid #eee;
   border-radius: 4px;
   display: flex;
+  flex-wrap: wrap; /* adicionado */
   margin: 0 0 10px 0;
   width: 100%;
 }
 
 .health-check-title-column {
-  flex: 0 0 400px;
+  flex: 1 1 200px; /* era 400px fixo */
   display: flex;
   align-items: center;
-  padding: 0 10px;
+  padding: 8px 10px;
 }
 
 .health-check-title-column h5 a {
@@ -107,15 +120,15 @@ canvas {
   justify-content: center;
   height: 2em;
   text-align: center;
-  width: 200px;
+  flex: 0 0 120px; /* era width: 200px fixo */
+  min-width: 80px;
 }
 
 .health-check-status-container.ok {
-  background: #75D701;
+  background: #75d701;
 }
-
 .health-check-status-container.failed {
-  background: #E53A40;
+  background: #e53a40;
 }
 
 .health-check-status-container h1 {
@@ -148,17 +161,45 @@ canvas {
 }
 
 .status-code-2xx:before {
-  background-color: #75D701;
+  background-color: #75d701;
 }
-
 .status-code-3xx:before {
   background-color: #47b8e0;
 }
-
 .status-code-4xx:before {
   background-color: #ffc952;
 }
-
 .status-code-5xx:before {
-  background-color: #E53A40;
+  background-color: #e53a40;
+}
+
+/* ── breakpoint mobile ─────────────────────────────── */
+@media (max-width: 600px) {
+  .container {
+    flex-direction: column;
+    height: auto;
+  }
+
+  .stats-column {
+    flex: none;
+    width: 100%;
+  }
+
+  .chart-container {
+    width: 100%;
+    flex: none;
+  }
+
+  .health-check-status-container {
+    border-radius: 0 0 4px 4px; /* arredonda só embaixo quando empilhado */
+    flex: 1 1 100%;
+    height: auto;
+    padding: 4px 0;
+  }
+
+  .span-controls {
+    float: none;
+    display: block;
+    margin-top: 8px;
+  }
 }
