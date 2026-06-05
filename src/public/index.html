@@ -1,9 +1,20 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
   <head>
     <title>{{title}}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="manifest" href="{{manifestPath}}" />
+    <meta name="theme-color" content="{{themeColor}}" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <link rel="icon" href="{{faviconPath}}" sizes="32x32" />
+    <link rel="icon" type="image/svg+xml" href="{{iconPath}}" />
+    <link rel="apple-touch-icon" href="{{appleTouchIconPath}}" sizes="180x180" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.2.2/Chart.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.1/socket.io.min.js" integrity="sha512-iqRVtNB+t9O+epcgUTIPF+nklypcR23H1yR1NFM9kffn6/iBhZ9bTB6oKLaGMv8JE9UgjcwfBFg/eHC/VMws+g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.1/socket.io.min.js"
+      integrity="sha512-iqRVtNB+t9O+epcgUTIPF+nklypcR23H1yR1NFM9kffn6/iBhZ9bTB6oKLaGMv8JE9UgjcwfBFg/eHC/VMws+g=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"></script>
     <style>
       {{{style}}}
     </style>
@@ -11,7 +22,7 @@
   <body class="{{bodyClasses}}">
     <div class="content">
       <div class="header">
-        <b>{{title}}</b>
+        <div class="header-title"><b>{{title}}</b></div>
         <div id="span-controls" class="span-controls"></div>
       </div>
       <div class="container cpu">
@@ -29,7 +40,7 @@
           <h1 id="memStat">- %</h1>
         </div>
         <div class="chart-container">
-          <canvas id="memChart" width="200" height="100"></canvas>
+          <canvas id="memChart" width="400" height="100"></canvas>
         </div>
       </div>
       <div class="container heap-size">
@@ -38,7 +49,7 @@
           <h1 id="heapStat">- %</h1>
         </div>
         <div class="chart-container">
-          <canvas id="heapChart" width="200" height="100"></canvas>
+          <canvas id="heapChart" width="400" height="100"></canvas>
         </div>
       </div>
       <div class="container load">
@@ -47,7 +58,7 @@
           <h1 id="loadStat">-</h1>
         </div>
         <div class="chart-container">
-          <canvas id="loadChart" width="200" height="100"></canvas>
+          <canvas id="loadChart" width="400" height="100"></canvas>
         </div>
       </div>
       <div class="container eventLoop">
@@ -56,7 +67,7 @@
           <h1 id="eventLoopStat">ms</h1>
         </div>
         <div class="chart-container">
-          <canvas id="eventLoopChart" width="200" height="100"></canvas>
+          <canvas id="eventLoopChart" width="400" height="100"></canvas>
         </div>
       </div>
       <div class="container responseTime">
@@ -65,7 +76,7 @@
           <h1 id="responseTimeStat">-</h1>
         </div>
         <div class="chart-container">
-          <canvas id="responseTimeChart" width="200" height="100"></canvas>
+          <canvas id="responseTimeChart" width="400" height="100"></canvas>
         </div>
       </div>
       <div class="container rps">
@@ -74,7 +85,7 @@
           <h1 id="rpsStat">-</h1>
         </div>
         <div class="chart-container">
-          <canvas id="rpsChart" width="200" height="100"></canvas>
+          <canvas id="rpsChart" width="400" height="100"></canvas>
         </div>
       </div>
       <div class="container statusCodes">
@@ -86,7 +97,7 @@
           <h6 class="status-code status-code-5xx">5xx</h6>
         </div>
         <div class="chart-container">
-          <canvas id="statusCodesChart" width="200" height="100"></canvas>
+          <canvas id="statusCodesChart" width="400" height="100"></canvas>
         </div>
       </div>
       <div class="container healthChecks">

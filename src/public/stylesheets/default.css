@@ -107,6 +107,8 @@ canvas {
   color: #888;
   cursor: pointer;
   text-decoration: none;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .health-check-title-column h5 a:hover {
@@ -143,8 +145,19 @@ canvas {
   text-align: center;
 }
 
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
 .span-controls {
-  float: right;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
 }
 
 .status-code {
@@ -175,6 +188,11 @@ canvas {
 
 /* ── breakpoint mobile ─────────────────────────────── */
 @media (max-width: 600px) {
+  .header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
   .container {
     flex-direction: column;
     height: auto;
@@ -198,8 +216,16 @@ canvas {
   }
 
   .span-controls {
-    float: none;
-    display: block;
-    margin-top: 8px;
+    margin-top: 4px;
+    justify-content: flex-start;
+  }
+
+  .span-controls span {
+    font-size: 12px;
+    margin-left: 0;
+    padding: 8px 12px;
+    min-height: 36px;
+    display: inline-flex;
+    align-items: center;
   }
 }

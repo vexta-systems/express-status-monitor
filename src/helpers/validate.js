@@ -1,5 +1,7 @@
 const defaultConfig = require('./default-config');
 
+const HEX_COLOR = /^#[0-9A-Fa-f]{6}$/;
+
 module.exports = config => {
   if (!config) {
     return defaultConfig;
@@ -44,7 +46,15 @@ module.exports = config => {
   config.healthChecks =
     Array.isArray(config.healthChecks)
       ? config.healthChecks
-      : defaultConfig.healthChecks
+      : defaultConfig.healthChecks;
+  config.themeColor =
+    typeof config.themeColor === 'string' && HEX_COLOR.test(config.themeColor)
+      ? config.themeColor
+      : defaultConfig.themeColor;
+  config.backgroundColor =
+    typeof config.backgroundColor === 'string' && HEX_COLOR.test(config.backgroundColor)
+      ? config.backgroundColor
+      : defaultConfig.backgroundColor;
 
   return config;
 };

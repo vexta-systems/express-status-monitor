@@ -1,21 +1,21 @@
 module.exports = {
-  title: 'Express Status',
+  title: 'Status API',
   theme: 'default.css',
   path: '/status',
   socketPath: '/socket.io',
   spans: [
     {
       interval: 1,
-      retention: 60,
+      retention: 120
     },
     {
       interval: 5,
-      retention: 60,
+      retention: 120
     },
     {
       interval: 15,
-      retention: 60,
-    },
+      retention: 120
+    }
   ],
   port: null,
   websocket: null,
@@ -28,8 +28,10 @@ module.exports = {
     eventLoop: true,
     responseTime: true,
     rps: true,
-    statusCodes: true,
+    statusCodes: true
   },
   ignoreStartsWith: '/admin',
   healthChecks: [],
+  themeColor: '#1a1a2e',
+  backgroundColor: '#12121f'
 };
