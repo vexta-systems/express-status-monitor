@@ -19,9 +19,7 @@ const loadWithFakePidusage = () => {
   return require(gatherPath); // eslint-disable-line global-require
 };
 
-/* Controls Date.now directly: another suite installs sinon fake timers globally,
- * so a second useFakeTimers() here would fail.
- */
+/* Controls Date.now only: fake timers would also freeze the clock used by the event loop tests below. */
 const START = 1700000000000;
 
 describe('gather-os-metrics', () => {
@@ -95,5 +93,66 @@ describe('gather-os-metrics', () => {
 
       span.responses.length.should.equal(1);
     });
+  });
+});
+
+/* Keeps the event loop busy for `ms` milliseconds (synchronously). */
+const busyFor = ms => {
+  const end = process.hrtime.bigint() + BigInt(ms) * 1000000n;
+
+  while (process.hrtime.bigint() < end) {
+    // busy wait
+  }
+};
+
+const lastStat = span => span.os[span.os.length - 1];
+
+describe('gather-os-metrics event loop', () => {
+  let gatherOsMetrics;
+
+  before(() => {
+    gatherOsMetrics = loadWithFakePidusage();
+  });
+
+  after(() => {
+    delete require.cache[require.resolve('pidusage')];
+  });
+
+  const newSpan = () => ({ interval: 1, retention: 60, os: [], responses: [] });
+  const io = { emit: () => undefined };
+
+  it('reports the time spent in the event loop without any native dependency', () => {
+    const span = newSpan();
+
+    gatherOsMetrics(io, span);
+    busyFor(60);
+    gatherOsMetrics(io, span);
+
+    const { loop } = lastStat(span);
+
+    loop.sum.should.be.at.least(50);
+    loop.utilization.should.be.within(0, 1);
+  });
+
+  it('has no event loop value on the first collection of a span', () => {
+    const span = newSpan();
+
+    gatherOsMetrics(io, span);
+
+    lastStat(span).should.not.have.property('loop');
+  });
+
+  it('measures each span over its own interval', () => {
+    const fast = newSpan();
+    const slow = newSpan();
+
+    gatherOsMetrics(io, fast);
+    gatherOsMetrics(io, slow);
+    busyFor(60);
+    gatherOsMetrics(io, fast);
+    gatherOsMetrics(io, slow);
+
+    lastStat(fast).loop.sum.should.be.at.least(50);
+    lastStat(slow).loop.sum.should.be.at.least(50);
   });
 });

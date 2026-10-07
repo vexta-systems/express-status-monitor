@@ -8,10 +8,12 @@ const defaultConfig = require('../../src/helpers/default-config');
 
 describe('on-headers-listener', () => {
   describe('when invoked', () => {
-    const clock = sinon.useFakeTimers();
     const spans = defaultConfig.spans;
+    // Installed in a hook (not at collection time) so the fake clock does not leak into other suites
+    let clock;
 
     before(() => {
+      clock = sinon.useFakeTimers();
       spans.forEach((span) => {
         span.responses = [];
       });

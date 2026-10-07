@@ -1,6 +1,6 @@
 {
   "name": "@vexta-systems/express-status-monitor",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "Realtime Monitoring for Express-based Node applications",
   "main": "index.js",
   "files": [
@@ -76,9 +76,6 @@
     "on-headers": "1.0.2",
     "pidusage": "4.0.1",
     "socket.io": "^4.4.1"
-  },
-  "optionalDependencies": {
-    "event-loop-stats": "1.2.0"
   },
   "scripts": {
     "test-ci": "mocha --recursive",

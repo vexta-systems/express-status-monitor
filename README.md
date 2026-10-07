@@ -40,30 +40,16 @@ Simple, self-hosted module based on Socket.io and Chart.js to report realtime se
 
 Requires Node.js 18 or newer.
 
-### Native event loop metrics (`event-loop-stats`)
+### Event loop metrics
 
-The event loop chart comes from `event-loop-stats`, an optional dependency with a
-native addon. If it is not built, the monitor still works and every other chart
-is shown; only the event loop chart stays empty (a warning
-`event-loop-stats not found` is logged once).
+The "Spent in Event Loop" chart uses Node's built-in
+[`performance.eventLoopUtilization()`](https://nodejs.org/api/perf_hooks.html#performanceeventlooputilizationutilization1-utilization2):
+no native addon, no build scripts and no toolchain needed. Each point is the
+time (ms) the event loop spent processing during that span's interval.
 
-- **pnpm** (10+) does not run dependency build scripts unless the consuming
-  project allows it. Add to the consuming project's `pnpm-workspace.yaml`:
-
-  ```yaml
-  # pnpm 10.x
-  onlyBuiltDependencies:
-    - event-loop-stats
-  # newer pnpm versions also accept:
-  # allowBuilds:
-  #   event-loop-stats: true
-  ```
-
-  then run `pnpm rebuild event-loop-stats`.
-- **npm** builds it automatically, but needs a native toolchain
-  ([node-gyp](https://github.com/nodejs/node-gyp#installation): Python and a C++
-  compiler, e.g. Visual Studio Build Tools on Windows). A failed build does not
-  fail the install.
+Since 1.4.1 the native `event-loop-stats` dependency is no longer used; if a
+consuming project allowed its build (`onlyBuiltDependencies` / `allowBuilds`),
+that entry can be removed.
 
 ### CI of the consuming project
 

@@ -3,8 +3,8 @@
  *
  * Verifica se o pacote, do jeito que é entregue, é consumível:
  * empacota com `npm pack`, instala o tarball num projeto vazio com npm e com
- * pnpm (sem liberar o build de event-loop-stats), sobe um app Express com o
- * middleware e confere o dashboard, o manifest e a emissão de métricas.
+ * pnpm (sem nenhum build nativo), sobe um app Express com o middleware e
+ * confere o dashboard, o manifest e a emissão de métricas (incluindo event loop).
  *
  * Uso:  node scripts/smoke-package.js [npm|pnpm ...]
  *       PNPM="npx -y pnpm@10" node scripts/smoke-package.js pnpm
@@ -55,19 +55,24 @@ const server = app.listen(0, async () => {
   }
 
   const socket = ioClient(base, { transports: ['websocket'] });
-  const timer = setTimeout(() => fail('nenhuma métrica esm_stats recebida em 10s'), 10000);
+  // 30s: no Windows o pidusage abre um PowerShell por coleta (1-3s cada), e o
+  // event loop só aparece a partir da terceira coleta do span.
+  const timer = setTimeout(() => fail('nenhuma métrica esm_stats com event loop recebida em 30s'), 30000);
 
   socket.on('esm_stats', data => {
-    // O primeiro evento de cada span ainda não tem amostra anterior (os vazio).
-    if (!data || !data.os) {
+    // As primeiras amostras de cada span ainda não têm os (vazio) nem o event loop
+    // (que precisa de uma coleta anterior como base).
+    if (!data || !data.os || !data.os.loop) {
       return;
     }
     if (typeof data.os.cpu !== 'number' || typeof data.os.memory !== 'number') {
       fail('esm_stats sem métricas de CPU/memória');
     }
+    if (typeof data.os.loop.sum !== 'number') {
+      fail('esm_stats sem métrica de event loop');
+    }
     clearTimeout(timer);
-    console.log('OK: dashboard, manifest e métricas'
-      + (data.os.loop ? ' (com event loop)' : ' (sem event loop)'));
+    console.log('OK: dashboard, manifest e métricas (CPU, memória e event loop)');
     process.exit(0);
   });
 });
