@@ -43,11 +43,11 @@ describe('middleware-wrapper', () => {
 
       it('and res.removeHeader is present, then header is removed', (done) => {
         const middlewareWithConfig = expresStatusMonitor({
-          iframe: true,
+          iframe: true
         });
         const resWithHeaders = Object.assign({}, res);
         resWithHeaders.headers = {
-          'X-Frame-Options': 1,
+          'X-Frame-Options': 1
         };
         resWithHeaders.removeHeader = sinon.stub();
 
