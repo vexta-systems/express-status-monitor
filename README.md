@@ -66,9 +66,18 @@ chartVisibility: {
   statusCodes: true
 },
 healthChecks: [],
-ignoreStartsWith: '/admin'
+ignoreStartsWith: '/admin',  // Requests whose path starts with this are not counted
+assetsPath: null,           // Prefix for manifest/icons/favicon (null = path, or '/status' when path is '')
+pagePath: null,             // Dashboard URL used as the PWA start_url (null = path, or assetsPath)
+socketAuth: null,           // (req) => object sent by the dashboard as socket.io `auth`
+authorize: null,            // (socket) => Promise<boolean>, checked at the socket.io handshake
+instanceLabel: null         // Text shown next to the title identifying this process
 
 ```
+
+The dashboard always connects using the WebSocket transport only, so it works
+behind a load balancer or in cluster mode (e.g. PM2 `-i N`) without sticky
+sessions. A reverse proxy must forward the WebSocket upgrade on `socketPath`.
 
 ## Health Checks
 
@@ -120,6 +129,32 @@ const statusMonitor = require('express-status-monitor')({ path: '' });
 app.use(statusMonitor.middleware); // use the "middleware only" property to manage websockets
 app.get('/status', basic.check(statusMonitor.pageRoute)); // use the pageRoute property to serve the dashboard html page
 ```
+
+### Securing the metrics stream
+
+Authenticating the page alone does not protect the metrics, which are sent over
+socket.io. Use `socketAuth` to hand the authenticated page a credential (for
+example a short-lived signed token) and `authorize` to check it. The check runs
+as a socket.io handshake middleware, so a rejected client never joins the server
+and never receives any metrics event.
+
+```javascript
+const statusMonitor = require('express-status-monitor')({
+  path: '',
+  assetsPath: '/status',
+  ignoreStartsWith: '/status',
+  socketAuth: req => ({ token: issueToken() }),
+  authorize: socket => Promise.resolve(isValidToken(socket.handshake.auth.token)),
+  instanceLabel: `pid ${process.pid}`
+});
+app.use(statusMonitor.middleware);
+app.get('/status', basic.check(statusMonitor.pageRoute));
+```
+
+In cluster mode each process has its own monitor: the dashboard shows the
+process that accepted the WebSocket, identified by `instanceLabel`. The token
+must therefore be valid on any process (e.g. signed with a shared secret instead
+of kept in memory).
 
 ## Using module with socket.io in project
 

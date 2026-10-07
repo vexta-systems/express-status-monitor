@@ -55,6 +55,48 @@ describe('validate', () => {
     });
   });
 
+  describe('ignoreStartsWith', () => {
+    it('keeps the configured prefix even when path is an empty string', () => {
+      validate({ path: '', ignoreStartsWith: '/status' }).ignoreStartsWith.should.equal('/status');
+    });
+
+    it(`falls back to ${defaultConfig.ignoreStartsWith} when not configured`, () => {
+      validate({ path: '' }).ignoreStartsWith.should.equal(defaultConfig.ignoreStartsWith);
+    });
+  });
+
+  describe('chartVisibility', () => {
+    it('hiding a chart in one config does not hide it in configs created later', () => {
+      validate({ chartVisibility: { cpu: false } }).chartVisibility.cpu.should.equal(false);
+
+      validate({ chartVisibility: {} }).chartVisibility.cpu.should.equal(true);
+      validate().chartVisibility.cpu.should.equal(true);
+    });
+  });
+
+  describe('assetsPath and pagePath', () => {
+    it('default to path when path is set', () => {
+      const config = validate({ path: '/monitor' });
+
+      config.assetsPath.should.equal('/monitor');
+      config.pagePath.should.equal('/monitor');
+    });
+
+    it(`default to ${defaultConfig.path} when path is empty`, () => {
+      const config = validate({ path: '' });
+
+      config.assetsPath.should.equal(defaultConfig.path);
+      config.pagePath.should.equal(defaultConfig.path);
+    });
+
+    it('use the configured values', () => {
+      const config = validate({ path: '', assetsPath: '/assets', pagePath: '/painel' });
+
+      config.assetsPath.should.equal('/assets');
+      config.pagePath.should.equal('/painel');
+    });
+  });
+
   describe('when config is valid', () => {
     const customConfig = { title: 'Custom title', path: '/custom-path', spans: [{}, {}, {}], port: 9999, websocket: {} };
     const config = validate(customConfig);

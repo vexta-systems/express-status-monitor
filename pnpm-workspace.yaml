@@ -1,3 +1,5 @@
+allowBuilds:
+  event-loop-stats: true
 onlyBuiltDependencies:
   - event-loop-stats
   - sharp

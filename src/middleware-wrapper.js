@@ -7,8 +7,8 @@ const onHeadersListener = require('./helpers/on-headers-listener');
 const socketIoInit = require('./helpers/socket-io-init');
 const healthChecker = require('./helpers/health-checker');
 
-const buildPwaPaths = (basePath) => {
-  const normalized = basePath === '/' ? '' : basePath.replace(/\/$/, '');
+const buildPwaPaths = (assetsPath, pagePath) => {
+  const normalized = assetsPath === '/' ? '' : assetsPath.replace(/\/$/, '');
   return {
     manifestPath: `${normalized}/manifest.webmanifest`,
     iconPath: `${normalized}/icons/Icone.svg`,
@@ -16,16 +16,25 @@ const buildPwaPaths = (basePath) => {
     faviconPath: `${normalized}/favicon.ico`,
     icon192Path: `${normalized}/icons/icon-192.png`,
     icon512Path: `${normalized}/icons/icon-512.png`,
-    startUrl: basePath,
-    scope: basePath === '/' ? '/' : `${normalized}/`
+    startUrl: pagePath,
+    scope: assetsPath === '/' ? '/' : `${normalized}/`
   };
 };
+
+// JSON that is safe to embed in an inline <script> (cannot close the tag or break the line).
+const toInlineScriptJson = (value) =>
+  JSON.stringify(value === undefined ? null : value)
+    .replace(/</g, '\\u003c')
+    .replace(/>/g, '\\u003e')
+    .replace(/&/g, '\\u0026')
+    .replace(/\u2028/g, '\\u2028')
+    .replace(/\u2029/g, '\\u2029');
 
 const buildShortName = (title) => (title.length > 12 ? `${title.slice(0, 12)}…` : title);
 
 const middlewareWrapper = (config) => {
   const validatedConfig = validate(config);
-  const pwaPaths = buildPwaPaths(validatedConfig.path);
+  const pwaPaths = buildPwaPaths(validatedConfig.assetsPath, validatedConfig.pagePath);
   const bodyClasses = Object.keys(validatedConfig.chartVisibility)
     .reduce((accumulator, key) => {
       if (validatedConfig.chartVisibility[key] === false) {
@@ -77,8 +86,13 @@ const middlewareWrapper = (config) => {
   const renderManifest = Handlebars.compile(manifestTmpl);
 
   const servePage = (req, res) => {
+    // Per-request auth data for the socket connection (e.g. a signed token)
+    const socketAuth = validatedConfig.socketAuth ? validatedConfig.socketAuth(req) : null;
     healthChecker(validatedConfig.healthChecks).then((results) => {
-      data.healthCheckResults = results;
+      const pageData = Object.assign({}, data, {
+        healthCheckResults: results,
+        socketAuthJson: toInlineScriptJson(socketAuth)
+      });
       if (validatedConfig.iframe) {
         if (res.removeHeader) {
           res.removeHeader('X-Frame-Options');
@@ -89,7 +103,7 @@ const middlewareWrapper = (config) => {
         }
       }
 
-      res.send(render(data));
+      res.send(render(pageData));
     });
   };
 
@@ -121,7 +135,7 @@ const middlewareWrapper = (config) => {
       return;
     }
 
-    if (req.path === pwaPaths.faviconPath || req.path === '/favicon.ico') {
+    if (req.path === pwaPaths.faviconPath) {
       res.type('image/x-icon');
       res.send(faviconIco);
       return;

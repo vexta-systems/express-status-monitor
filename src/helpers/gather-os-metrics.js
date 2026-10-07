@@ -42,7 +42,8 @@ module.exports = (io, span) => {
     }
 
     span.os.push(stat);
-    if (!span.responses[0] || (last.timestamp + span.interval) * 1000 < Date.now()) {
+    // timestamp is in ms and interval in seconds
+    if (!span.responses[0] || last.timestamp + span.interval * 1000 < Date.now()) {
       span.responses.push(defaultResponse);
     }
 

@@ -2,18 +2,19 @@ const defaultConfig = require('./default-config');
 
 const HEX_COLOR = /^#[0-9A-Fa-f]{6}$/;
 
-module.exports = config => {
-  if (!config) {
-    return defaultConfig;
-  }
+module.exports = inputConfig => {
+  // No config: still normalize, so derived options (assetsPath, pagePath) get their defaults.
+  const config = inputConfig || {};
 
+  // Works on a copy so that one instance's config does not leak into others.
   const mungeChartVisibility = configChartVisibility => {
-    Object.keys(defaultConfig.chartVisibility).forEach(key => {
+    const chartVisibility = Object.assign({}, defaultConfig.chartVisibility);
+    Object.keys(chartVisibility).forEach(key => {
       if (configChartVisibility[key] === false) {
-        defaultConfig.chartVisibility[key] = false;
+        chartVisibility[key] = false;
       }
     });
-    return defaultConfig.chartVisibility;
+    return chartVisibility;
   };
 
   config.title =
@@ -39,9 +40,29 @@ module.exports = config => {
       ? mungeChartVisibility(config.chartVisibility)
       : defaultConfig.chartVisibility;
   config.ignoreStartsWith =
-    typeof config.path === 'string'
+    typeof config.ignoreStartsWith === 'string'
       ? config.ignoreStartsWith
       : defaultConfig.ignoreStartsWith;
+
+  // PWA assets and page URL: independent from `path`, which may be '' when
+  // the page is served by a separate (authenticated) route.
+  config.assetsPath =
+    typeof config.assetsPath === 'string' && config.assetsPath !== ''
+      ? config.assetsPath
+      : config.path || defaultConfig.path;
+  config.pagePath =
+    typeof config.pagePath === 'string' && config.pagePath !== ''
+      ? config.pagePath
+      : config.path || config.assetsPath;
+
+  config.socketAuth =
+    typeof config.socketAuth === 'function' ? config.socketAuth : defaultConfig.socketAuth;
+  config.authorize =
+    typeof config.authorize === 'function' ? config.authorize : defaultConfig.authorize;
+  config.instanceLabel =
+    typeof config.instanceLabel === 'string' && config.instanceLabel !== ''
+      ? config.instanceLabel
+      : defaultConfig.instanceLabel;
 
   config.healthChecks =
     Array.isArray(config.healthChecks)
