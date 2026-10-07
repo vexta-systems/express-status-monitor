@@ -9,6 +9,7 @@ const healthChecker = require('./helpers/health-checker');
 
 const buildPwaPaths = (assetsPath, pagePath) => {
   const normalized = assetsPath === '/' ? '' : assetsPath.replace(/\/$/, '');
+
   return {
     manifestPath: `${normalized}/manifest.webmanifest`,
     iconPath: `${normalized}/icons/Icone.svg`,
@@ -22,7 +23,7 @@ const buildPwaPaths = (assetsPath, pagePath) => {
 };
 
 // JSON that is safe to embed in an inline <script> (cannot close the tag or break the line).
-const toInlineScriptJson = (value) =>
+const toInlineScriptJson = value =>
   JSON.stringify(value === undefined ? null : value)
     .replace(/</g, '\\u003c')
     .replace(/>/g, '\\u003e')
@@ -30,9 +31,9 @@ const toInlineScriptJson = (value) =>
     .replace(/\u2028/g, '\\u2028')
     .replace(/\u2029/g, '\\u2029');
 
-const buildShortName = (title) => (title.length > 12 ? `${title.slice(0, 12)}…` : title);
+const buildShortName = title => (title.length > 12 ? `${title.slice(0, 12)}…` : title);
 
-const middlewareWrapper = (config) => {
+const middlewareWrapper = config => {
   const validatedConfig = validate(config);
   const pwaPaths = buildPwaPaths(validatedConfig.assetsPath, validatedConfig.pagePath);
   const bodyClasses = Object.keys(validatedConfig.chartVisibility)
@@ -88,11 +89,13 @@ const middlewareWrapper = (config) => {
   const servePage = (req, res) => {
     // Per-request auth data for the socket connection (e.g. a signed token)
     const socketAuth = validatedConfig.socketAuth ? validatedConfig.socketAuth(req) : null;
-    healthChecker(validatedConfig.healthChecks).then((results) => {
+
+    healthChecker(validatedConfig.healthChecks).then(results => {
       const pageData = Object.assign({}, data, {
         healthCheckResults: results,
         socketAuthJson: toInlineScriptJson(socketAuth)
       });
+
       if (validatedConfig.iframe) {
         if (res.removeHeader) {
           res.removeHeader('X-Frame-Options');
@@ -166,7 +169,7 @@ const middlewareWrapper = (config) => {
    * so that the HTML page can be authenticated while the middleware can be
    * earlier in the request handling chain.  Use like:
    * ```
-   * const statusMonitor = require('express-status-monitor')(config);
+   * const statusMonitor = require('@vexta-systems/express-status-monitor')(config);
    * server.use(statusMonitor);
    * server.get('/status', isAuthenticated, statusMonitor.pageRoute);
    * ```

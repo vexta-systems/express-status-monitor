@@ -1,9 +1,12 @@
-# express-status-monitor
+# @vexta-systems/express-status-monitor
 
-[![express-status-monitor on npm](https://img.shields.io/npm/v/express-status-monitor.svg)](https://www.npmjs.com/express-status-monitor)
-[![npm](https://img.shields.io/npm/dt/express-status-monitor.svg)](https://img.shields.io/npm/dt/express-status-monitor.svg)
-[![CircleCI](https://img.shields.io/circleci/project/github/RafalWilinski/express-status-monitor/master.svg)](https://circleci.com/gh/RafalWilinski/express-status-monitor)
-[![Open Source Helpers](https://www.codetriage.com/rafalwilinski/express-status-monitor/badges/users.svg)](https://www.codetriage.com/rafalwilinski/express-status-monitor)
+[![CI](https://github.com/vexta-systems/express-status-monitor/actions/workflows/ci.yml/badge.svg)](https://github.com/vexta-systems/express-status-monitor/actions/workflows/ci.yml)
+
+> Fork of [RafalWilinski/express-status-monitor](https://github.com/RafalWilinski/express-status-monitor)
+> maintained by Vexta. It adds socket.io handshake authorization (`socketAuth` /
+> `authorize`), `instanceLabel` for cluster mode, `assetsPath` / `pagePath`, an
+> installable PWA dashboard and a mobile layout. It is distributed from GitHub
+> tags, not from the npm registry.
 
 Simple, self-hosted module based on Socket.io and Chart.js to report realtime server metrics for Express-based node servers.
 
@@ -20,12 +23,52 @@ Simple, self-hosted module based on Socket.io and Chart.js to report realtime se
 
 ## Installation & setup
 
-1. Run `npm install express-status-monitor --save`
+1. Install from a release tag of this repository (no registry, no token needed):
+
+   ```bash
+   # npm
+   npm install github:vexta-systems/express-status-monitor#v1.4.0
+   # pnpm
+   pnpm add github:vexta-systems/express-status-monitor#v1.4.0
+   ```
+
+   Both register the dependency as `@vexta-systems/express-status-monitor` and
+   pin the exact commit in the lockfile. To upgrade, change the tag.
 2. Before any other middleware or router add following line:
-`app.use(require('express-status-monitor')());`
+`app.use(require('@vexta-systems/express-status-monitor')());`
 3. Run server and go to `/status`
 
-Note: This plugin works on Node versions > 4.x
+Requires Node.js 18 or newer.
+
+### Native event loop metrics (`event-loop-stats`)
+
+The event loop chart comes from `event-loop-stats`, an optional dependency with a
+native addon. If it is not built, the monitor still works and every other chart
+is shown; only the event loop chart stays empty (a warning
+`event-loop-stats not found` is logged once).
+
+- **pnpm** (10+) does not run dependency build scripts unless the consuming
+  project allows it. Add to the consuming project's `pnpm-workspace.yaml`:
+
+  ```yaml
+  # pnpm 10.x
+  onlyBuiltDependencies:
+    - event-loop-stats
+  # newer pnpm versions also accept:
+  # allowBuilds:
+  #   event-loop-stats: true
+  ```
+
+  then run `pnpm rebuild event-loop-stats`.
+- **npm** builds it automatically, but needs a native toolchain
+  ([node-gyp](https://github.com/nodejs/node-gyp#installation): Python and a C++
+  compiler, e.g. Visual Studio Build Tools on Windows). A failed build does not
+  fail the install.
+
+### CI of the consuming project
+
+Installing a `github:` dependency requires `git` in the build environment.
+Minimal images such as `node:*-alpine` do not ship it (`apk add --no-cache git`).
 
 ## Run examples
 
@@ -110,7 +153,7 @@ Example using https://www.npmjs.com/package/connect-ensure-login
 ```javascript
 const ensureLoggedIn = require('connect-ensure-login').ensureLoggedIn()
 
-const statusMonitor = require('express-status-monitor')();
+const statusMonitor = require('@vexta-systems/express-status-monitor')();
 app.use(statusMonitor);
 app.get('/status', ensureLoggedIn, statusMonitor.pageRoute)
 ```
@@ -125,7 +168,7 @@ const basic = auth.basic({realm: 'Monitor Area'}, function(user, pass, callback)
 });
 
 // Set '' to config path to avoid middleware serving the html page (path must be a string not equal to the wanted route)
-const statusMonitor = require('express-status-monitor')({ path: '' });
+const statusMonitor = require('@vexta-systems/express-status-monitor')({ path: '' });
 app.use(statusMonitor.middleware); // use the "middleware only" property to manage websockets
 app.get('/status', basic.check(statusMonitor.pageRoute)); // use the pageRoute property to serve the dashboard html page
 ```
@@ -139,7 +182,7 @@ as a socket.io handshake middleware, so a rejected client never joins the server
 and never receives any metrics event.
 
 ```javascript
-const statusMonitor = require('express-status-monitor')({
+const statusMonitor = require('@vexta-systems/express-status-monitor')({
   path: '',
   assetsPath: '/status',
   ignoreStartsWith: '/status',
@@ -162,10 +205,12 @@ If you're using socket.io in your project, this module could break your project 
 
 ## Tests and coverage
 
-In order to run test and coverage use the following npm commands:
+This repository uses pnpm (version pinned in `packageManager`):
 ```
-npm test
-npm run coverage
+pnpm install
+pnpm run eslint
+pnpm run test-ci
+node scripts/smoke-package.js   # packs the module and installs it with npm and pnpm
 ```
 
 ## License

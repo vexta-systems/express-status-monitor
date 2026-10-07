@@ -21,8 +21,8 @@ importers:
         specifier: 1.0.2
         version: 1.0.2
       pidusage:
-        specifier: 2.0.18
-        version: 2.0.18
+        specifier: 4.0.1
+        version: 4.0.1
       socket.io:
         specifier: ^4.4.1
         version: 4.8.3
@@ -622,9 +622,9 @@ packages:
     resolution: {integrity: sha512-V7+vQEJ06Z+c5tSye8S+nHUfI51xoXIXjHQ99cQtKUkQqqO1kO/KCJUfZXuB47h/YBlDhah2H3hdUGXn8ie0oA==}
     engines: {node: '>=8.6'}
 
-  pidusage@2.0.18:
-    resolution: {integrity: sha512-Y/VfKfh3poHjMEINxU+gJTeVOBjiThQeFAmzR7z56HSNiMx+etl+yBhk42nRPciPYt/VZl8DQLVXNC6P5vH11A==}
-    engines: {node: '>=8'}
+  pidusage@4.0.1:
+    resolution: {integrity: sha512-yCH2dtLHfEBnzlHUJymR/Z1nN2ePG3m392Mv8TFlTP1B0xkpMQNHAnfkY0n2tAi6ceKO6YWhxYfZ96V4vVkh/g==}
+    engines: {node: '>=18'}
 
   prelude-ls@1.2.1:
     resolution: {integrity: sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==}
@@ -1432,7 +1432,7 @@ snapshots:
 
   picomatch@2.3.2: {}
 
-  pidusage@2.0.18:
+  pidusage@4.0.1:
     dependencies:
       safe-buffer: 5.2.1
 

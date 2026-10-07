@@ -5,7 +5,7 @@
     },
     "parserOptions": {
         "sourceType": "module",
-        "ecmaVersion": 8
+        "ecmaVersion": 2020
     },
     "extends": "eslint:recommended",
     "rules": {
@@ -257,5 +257,19 @@
             "error",
             "never"
         ]
-    }
+    },
+    "overrides": [
+        {
+            "files": ["scripts/**"],
+            "rules": {
+                "no-bitwise": "off",
+                "no-plusplus": "off",
+                "no-mixed-operators": "off",
+                "no-continue": "off",
+                "no-process-exit": "off",
+                "global-require": "off",
+                "camelcase": ["error", { "properties": "never" }]
+            }
+        }
+    ]
 }

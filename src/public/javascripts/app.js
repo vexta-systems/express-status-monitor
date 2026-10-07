@@ -17,6 +17,7 @@ var socketOptions = {
   path: socketPath,
   transports: ['websocket']
 };
+
 if (socketAuth) {
   socketOptions.auth = socketAuth;
 }
@@ -24,8 +25,10 @@ var socket = io(location.protocol + '//' + location.hostname + ':' + (port || lo
 
 // Identifies the process whose metrics are shown (relevant in cluster mode)
 var baseTitle = document.title;
+
 socket.on('esm_instance', function (label) {
   var headerTitle = document.querySelector('.header-title b');
+
   document.title = baseTitle + ' · ' + label;
   if (headerTitle) {
     headerTitle.textContent = baseTitle + ' · ' + label;

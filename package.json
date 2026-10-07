@@ -1,9 +1,13 @@
 {
-  "name": "express-status-monitor",
-  "version": "1.3.6",
+  "name": "@vexta-systems/express-status-monitor",
+  "version": "1.4.0",
   "description": "Realtime Monitoring for Express-based Node applications",
   "main": "index.js",
-  "homepage": "https://dynobase.com",
+  "files": [
+    "index.js",
+    "src/"
+  ],
+  "homepage": "https://github.com/vexta-systems/express-status-monitor#readme",
   "keywords": [
     "node",
     "status",
@@ -12,7 +16,7 @@
     "charts"
   ],
   "engines": {
-    "node": ">=8"
+    "node": ">=18"
   },
   "author": "Rafal Wilinski <raf.wilinski@gmail.com> (https://dynobase.com)",
   "contributors": [
@@ -59,7 +63,10 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/RafalWilinski/express-status-monitor.git"
+    "url": "git+https://github.com/vexta-systems/express-status-monitor.git"
+  },
+  "bugs": {
+    "url": "https://github.com/vexta-systems/express-status-monitor/issues"
   },
   "license": "MIT",
   "dependencies": {
@@ -67,7 +74,7 @@
     "debug": "4.1.1",
     "handlebars": "^4.7.7",
     "on-headers": "1.0.2",
-    "pidusage": "2.0.18",
+    "pidusage": "4.0.1",
     "socket.io": "^4.4.1"
   },
   "optionalDependencies": {
@@ -86,8 +93,5 @@
     "sinon": "13.0.1",
     "socket.io-client": "^4.8.4"
   },
-  "funding": {
-    "type": "individual",
-    "url": "http://dynobase.com/buy"
-  }
+  "packageManager": "pnpm@10.34.6"
 }
