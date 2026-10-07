@@ -213,6 +213,23 @@ pnpm run test-ci
 node scripts/smoke-package.js   # packs the module and installs it with npm and pnpm
 ```
 
+## Releasing
+
+1. Bump `version` in `package.json` and add a `## vX.Y.Z` section to `CHANGELOG.md`.
+2. Commit, then tag and push the tag:
+
+   ```bash
+   git tag -a vX.Y.Z -m "vX.Y.Z"
+   git push origin master vX.Y.Z
+   ```
+
+The `Release` workflow lints, tests and smoke-tests the tagged commit, checks that
+the tag matches `package.json` and creates the GitHub Release from the
+`CHANGELOG.md` section. Tags with a suffix (`v1.5.0-rc.1`) become pre-releases.
+For a tag pushed before the workflow existed, run it manually from the Actions tab
+(*Release → Run workflow*, input `tag`). Tags are treated as immutable: fix
+mistakes with a new version.
+
 ## License
 
 [MIT License](https://opensource.org/licenses/MIT) © [Dynobase](https://dynobase.com)

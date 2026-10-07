@@ -45,7 +45,16 @@
 
 ## 7. Release e validação
 
-- [ ] 7.1 Commitar as mudanças da change e dar push em `master`; confirmar CI verde
-- [ ] 7.2 Criar a tag `v1.4.0` e dar push
-- [ ] 7.3 Num projeto vazio, `npm install github:vexta-systems/express-status-monitor#v1.4.0`, fazer `require('@vexta-systems/express-status-monitor')` e abrir o dashboard
+- [x] 7.1 Commitar as mudanças da change e dar push em `master`; confirmar CI verde
+- [x] 7.2 Criar a tag `v1.4.0` e dar push
+- [x] 7.3 Num projeto vazio, `npm install github:vexta-systems/express-status-monitor#v1.4.0`, fazer `require('@vexta-systems/express-status-monitor')` e abrir o dashboard
 - [ ] 7.4 Repetir 7.3 com `pnpm add`, primeiro sem e depois com a liberação de build de `event-loop-stats`, confirmando que o gráfico de event loop só aparece no segundo caso
+  - Parcial (2026-10-07, Windows sem VS Build Tools): sem liberação → "Ignored build scripts" e dashboard sem event loop ✓; com `onlyBuiltDependencies` → pnpm passa a compilar (config respeitada), mas a compilação falha por falta de toolchain. Compilação + gráfico de event loop comprovados só via npm na CI Linux. Falta: pnpm com liberação em Linux/WSL ou máquina com toolchain.
+
+## 8. Release automática
+
+- [x] 8.1 Criar `CHANGELOG.md` com a seção `## v1.4.0`
+- [x] 8.2 Criar `scripts/release-notes.js` (versão do `package.json` na tag = tag; seção do CHANGELOG obrigatória; instruções de instalação) e testar os casos válido, versão divergente, seção ausente e tag inválida
+- [x] 8.3 Criar `.github/workflows/release.yml` (push de `v*` + `workflow_dispatch`): verificação da tag e depois `gh release create`/`edit`
+- [x] 8.4 Documentar no README como publicar uma versão
+- [ ] 8.5 Push em `master` e disparar o workflow para a `v1.4.0` já existente; conferir a Release como Latest

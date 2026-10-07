@@ -92,3 +92,27 @@ O namespace de log do `debug` MUST continuar sendo `express-status-monitor`.
 
 - **WHEN** o app consumidor roda com `DEBUG=express-status-monitor`
 - **THEN** as mensagens de debug do monitor são exibidas
+
+### Requirement: GitHub Release criada a partir da tag
+
+O push de uma tag `vX.Y.Z` MUST gerar uma GitHub Release com o corpo tirado da seção `## vX.Y.Z` do `CHANGELOG.md` e com as instruções de instalação, somente depois de lint, testes e smoke do pacote passarem no commit da tag.
+
+#### Scenario: Tag de versão válida
+
+- **WHEN** a tag `v1.4.0` é enviada e o `package.json` desse commit tem `version: 1.4.0` e o `CHANGELOG.md` tem a seção `## v1.4.0`
+- **THEN** uma Release `v1.4.0` é publicada com essa seção e os comandos `npm install` / `pnpm add github:vexta-systems/express-status-monitor#v1.4.0`
+
+#### Scenario: Versão do pacote diferente da tag
+
+- **WHEN** a tag enviada não corresponde ao `version` do `package.json` no commit da tag
+- **THEN** o workflow falha e nenhuma Release é criada
+
+#### Scenario: CHANGELOG sem a seção da versão
+
+- **WHEN** o `CHANGELOG.md` não tem a seção `## <tag>`
+- **THEN** o workflow falha e nenhuma Release é criada
+
+#### Scenario: Pacote quebrado na tag
+
+- **WHEN** lint, testes ou smoke do pacote falham no commit da tag
+- **THEN** nenhuma Release é criada

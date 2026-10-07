@@ -26,7 +26,7 @@ Consumidores podem usar npm ou pnpm. O repositório continua público.
 - Publicar em npmjs.com ou GitHub Packages (o nome com escopo deixa isso possível depois, sem mudar o `require`)
 - Atualizar dependências de runtime (ex.: `axios 0.26.0`) — fica para outra change, **exceto `pidusage`** (ver decisão abaixo)
 - Mudar a API de configuração do middleware ou o comportamento do dashboard
-- Automatizar a criação de releases/tags na CI
+- Criar tags automaticamente (a tag continua sendo um ato manual de quem libera a versão)
 
 ## Decisions
 
@@ -78,6 +78,12 @@ Workflow `.github/workflows/ci.yml`, em `push` e `pull_request`:
 O passo 4 é o teste que importa para esta change: se falhar, significa que o pacote entregue não é consumível. Ele cobre também o requisito de funcionar sem a dependência nativa. O script do smoke fica em `scripts/` (fora do pacote) e roda em uma só versão de Node da matriz.
 
 Sem nenhum passo de publish nem secret de registry.
+
+### GitHub Release automática no push da tag
+
+A seção Releases do GitHub só mostra objetos *Release*, não tags. O workflow `.github/workflows/release.yml` roda no push de `v*` e também por `workflow_dispatch` (para tags enviadas antes dele existir, como a `v1.4.0`). Primeiro verifica o commit da tag (lint, testes, smoke); depois `scripts/release-notes.js` confere que o `version` do `package.json` **no commit da tag** bate com a tag e extrai a seção `## <tag>` do `CHANGELOG.md`, acrescentando as instruções de instalação. Tags com sufixo (`v1.5.0-rc.1`) viram pré-release. O passo é idempotente: se a Release já existe, ela é editada.
+
+Alternativas: `--generate-notes` (sem PRs no fork, gera só o link de comparação) e a mensagem da tag anotada (pouco visível e fácil de esquecer). O CHANGELOG obriga a documentar a versão, e a falha do workflow quando falta a seção é intencional.
 
 ### Exceção: `pidusage` 2.0.18 → 4.0.1
 

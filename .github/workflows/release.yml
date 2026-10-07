@@ -1,0 +1,65 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+  # Para tags já enviadas antes deste workflow existir (ex.: v1.4.0)
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag existente (ex.: v1.4.0)'
+        required: true
+
+concurrency:
+  group: release-${{ inputs.tag || github.ref_name }}
+
+jobs:
+  verify:
+    name: Verificar a tag
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      TAG: ${{ inputs.tag || github.ref_name }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.TAG }}
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run eslint
+      - run: pnpm run test-ci
+      - run: node scripts/smoke-package.js
+
+  release:
+    name: Criar GitHub Release
+    needs: verify
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      TAG: ${{ inputs.tag || github.ref_name }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      # Checkout da ref do workflow (tag no push, master no dispatch): é dela que
+      # vêm o CHANGELOG e o script; a versão é conferida no commit da tag.
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node scripts/release-notes.js "$TAG" > notes.md
+      - name: Publicar
+        run: |
+          prerelease=""
+          case "$TAG" in *-*) prerelease="--prerelease" ;; esac
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release edit "$TAG" --title "$TAG" --notes-file notes.md $prerelease
+          else
+            gh release create "$TAG" --title "$TAG" --notes-file notes.md --verify-tag $prerelease
+          fi
