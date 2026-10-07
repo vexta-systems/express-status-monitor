@@ -57,4 +57,4 @@
 - [x] 8.2 Criar `scripts/release-notes.js` (versão do `package.json` na tag = tag; seção do CHANGELOG obrigatória; instruções de instalação) e testar os casos válido, versão divergente, seção ausente e tag inválida
 - [x] 8.3 Criar `.github/workflows/release.yml` (push de `v*` + `workflow_dispatch`): verificação da tag e depois `gh release create`/`edit`
 - [x] 8.4 Documentar no README como publicar uma versão
-- [ ] 8.5 Push em `master` e disparar o workflow para a `v1.4.0` já existente; conferir a Release como Latest
+- [x] 8.5 Push em `master` e disparar o workflow para a `v1.4.0` já existente; conferir a Release como Latest
